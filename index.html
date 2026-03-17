@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#e91e8c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Flamingo Park</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fff5f8;
+  --surface: #ffffff;
+  --surface2: #fce8f0;
+  --border: #f0d0dd;
+  --text: #1c1917;
+  --text2: #78716c;
+  --text3: #a8a29e;
+  --accent: #e91e8c;
+  --accent-light: #fff0f7;
+  --green: #15803d;
+  --green-light: #f0fdf4;
+  --amber: #b45309;
+  --amber-light: #fffbeb;
+  --blue: #1d4ed8;
+  --blue-light: #eff6ff;
+  --red: #dc2626;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; }
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { background: var(--accent); color: #fff; padding: 14px 16px 12px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-title { font-size: 16px; font-weight: 700; }
+.topbar-sub { font-size: 11px; color: rgba(255,255,255,0.75); }
+.topbar-date { font-size: 11px; color: rgba(255,255,255,0.8); text-align: right; }
+.bottom-nav { background: var(--surface); border-top: 1px solid var(--border); display: flex; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; z-index: 100; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 4px 8px; cursor: pointer; border: none; background: none; color: var(--text3); font-family: inherit; font-size: 10px; font-weight: 600; transition: color 0.15s; }
+.nav-btn.active { color: var(--accent); }
+.nav-btn svg { width: 22px; height: 22px; }
+.page { display: none; flex: 1; padding: 16px 16px 90px; }
+.page.active { display: block; }
+.card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow); }
+.card-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 12px 14px; box-shadow: var(--shadow); }
+.stat-label { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 4px; }
+.stat-value { font-size: 20px; font-weight: 700; }
+.stat-value.green { color: var(--green); }
+.stat-value.red { color: var(--red); }
+.stat-value.amber { color: var(--amber); }
+.stat-value.blue { color: var(--blue); }
+.stat-value.pink { color: var(--accent); }
+.form-group { margin-bottom: 12px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; display: block; }
+.form-input, .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s; }
+.form-input:focus, .form-select:focus { border-color: var(--accent); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { padding: 11px 18px; border-radius: var(--radius-sm); border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-success { background: var(--green); color: #fff; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+.btn-danger { background: #fef2f2; color: var(--red); border: 1px solid #fecaca; }
+.btn-full { width: 100%; justify-content: center; }
+.list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 8px; }
+.list-item:last-child { border-bottom: none; }
+.list-item-info { flex: 1; min-width: 0; }
+.list-item-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-item-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+.list-item-right { text-align: right; flex-shrink: 0; }
+.list-item-amount { font-size: 14px; font-weight: 700; }
+.list-item-amount.income { color: var(--green); }
+.list-item-amount.expense { color: var(--red); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-red { background: #fef2f2; color: var(--red); }
+.badge-amber { background: var(--amber-light); color: var(--amber); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.badge-pink { background: var(--accent-light); color: var(--accent); }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.tab-bar { display: flex; gap: 6px; margin-bottom: 14px; background: var(--surface2); padding: 4px; border-radius: var(--radius-sm); }
+.tab-btn { flex: 1; padding: 7px 4px; border: none; background: none; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text2); cursor: pointer; border-radius: 6px; transition: all 0.15s; }
+.tab-btn.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
+.progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; max-width: 430px; margin: 0 auto; left: 50%; transform: translateX(-50%); }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px 16px 32px; width: 100%; max-height: 85vh; overflow-y: auto; }
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.empty-state { text-align: center; padding: 32px 16px; color: var(--text3); }
+.empty-state-icon { font-size: 40px; margin-bottom: 8px; }
+.empty-state-text { font-size: 13px; }
+.divider { height: 1px; background: var(--border); margin: 12px 0; }
+.receipt { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.receipt-header { text-align: center; margin-bottom: 12px; }
+.receipt-title { font-size: 16px; font-weight: 700; color: var(--accent); }
+.receipt-sub { font-size: 12px; color: var(--text2); }
+.receipt-row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; }
+.receipt-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--border); }
+.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 300; display: none; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">🦩 Flamingo Park</div>
+      <div class="topbar-sub" id="topbar-sub">Bugünün özeti</div>
+    </div>
+    <div class="topbar-date" id="topbar-date"></div>
+  </div>
+  <div class="page active" id="page-dashboard"></div>
+  <div class="page" id="page-gelir-gider"></div>
+  <div class="page" id="page-stok"></div>
+  <div class="page" id="page-kisiler"></div>
+  <div class="page" id="page-fatura"></div>
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="goPage('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Özet
+    </button>
+    <button class="nav-btn" onclick="goPage('gelir-gider',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Kasa
+    </button>
+    <button class="nav-btn" onclick="goPage('stok',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      Stok
+    </button>
+    <button class="nav-btn" onclick="goPage('kisiler',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Kişiler
+    </button>
+    <button class="nav-btn" onclick="goPage('fatura',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Fiş
+    </button>
+  </nav>
+</div>
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <div class="modal-handle"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DB = { get: k => JSON.parse(localStorage.getItem('fp_'+k)||'null'), set: (k,v) => localStorage.setItem('fp_'+k, JSON.stringify(v)) };
+let transactions = DB.get('transactions') || [];
+let stocks = DB.get('stocks') || [
+  {id:1, name:'Türk Kahvesi', unit:'gr', qty:500, minQty:100, cost:0.8, category:'İçecek'},
+  {id:2, name:'Sütlü Kahve', unit:'lt', qty:5, minQty:1, cost:12, category:'İçecek'},
+  {id:3, name:'Şeker', unit:'kg', qty:3, minQty:0.5, cost:5, category:'Malzeme'},
+  {id:4, name:'Bardak', unit:'adet', qty:200, minQty:50, cost:0.5, category:'Ambalaj'},
+];
+let contacts = DB.get('contacts') || [
+  {id:1, name:'Kahve Tedarikçi A.Ş.', type:'tedarikçi', phone:'0212 555 0001', balance:-1200},
+  {id:2, name:'Ali Yılmaz', type:'müşteri', phone:'0532 444 0002', balance:350},
+];
+let invoices = DB.get('invoices') || [];
+let nextId = DB.get('nextId') || 100;
+function newId() { nextId++; DB.set('nextId', nextId); return nextId; }
+function save() { DB.set('transactions', transactions); DB.set('stocks', stocks); DB.set('contacts', contacts); DB.set('invoices', invoices); }
+function fmt(n) { return new Intl.NumberFormat('tr-TR', {style:'currency', currency:'TRY', minimumFractionDigits:2}).format(n||0); }
+function fmtDate(d) { return new Date(d).toLocaleDateString('tr-TR', {day:'2-digit', month:'short', year:'numeric'}); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display='none', 2200); }
+function goPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  const titles = {dashboard:'Bugünün özeti','gelir-gider':'Gelir & Gider',stok:'Stok Yönetimi',kisiler:'Müşteri & Tedarikçi',fatura:'Fiş / Fatura'};
+  document.getElementById('topbar-sub').textContent = titles[name]||'';
+  renderPage(name);
+}
+function renderPage(name) { const fns = {dashboard:renderDashboard,'gelir-gider':renderGelirGider,stok:renderStok,kisiler:renderKisiler,fatura:renderFatura}; if(fns[name]) fns[name](); }
+function openModal(html) { document.getElementById('modal-body').innerHTML = html; document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal(e) { if(!e || e.target === document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open'); }
+
+function renderDashboard() {
+  const todayStr = today();
+  const todayTx = transactions.filter(t => t.date === todayStr);
+  const monthTx = transactions.filter(t => t.date && t.date.startsWith(todayStr.slice(0,7)));
+  const todayIncome = todayTx.filter(t=>t.type==='gelir').reduce((s,t)=>s+t.amount,0);
+  const todayExpense = todayTx.filter(t=>t.type==='gider').reduce((s,t)=>s+t.amount,0);
+  const monthIncome = monthTx.filter(t=>t.type==='gelir').reduce((s,t)=>s+t.amount,0);
+  const monthExpense = monthTx.filter(t=>t.type==='gider').reduce((s,t)=>s+t.amount,0);
+  const lowStock = stocks.filter(s => s.qty <= s.minQty);
+  const last5 = [...transactions].sort((a,b)=>b.id-a.id).slice(0,5);
+  let html = `<div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Bugün Gelir</div><div class="stat-value green">${fmt(todayIncome)}</div></div>
+    <div class="stat-card"><div class="stat-label">Bugün Gider</div><div class="stat-value red">${fmt(todayExpense)}</div></div>
+    <div class="stat-card"><div class="stat-label">Bu Ay Net</div><div class="stat-value ${monthIncome-monthExpense>=0?'green':'red'}">${fmt(monthIncome-monthExpense)}</div></div>
+    <div class="stat-card"><div class="stat-label">Stok Uyarı</div><div class="stat-value amber">${lowStock.length} ürün</div></div>
+  </div>`;
+  if(lowStock.length) html += `<div class="card"><div class="card-title">⚠️ Kritik Stok</div>${lowStock.map(s=>`<div class="list-item"><div class="list-item-info"><div class="list-item-name">${s.name}</div><div class="list-item-sub">${s.category}</div></div><div class="list-item-right"><span class="badge badge-red">${s.qty} ${s.unit}</span></div></div>`).join('')}</div>`;
+  html += `<div class="card"><div class="section-header"><div class="card-title" style="margin:0">Son İşlemler</div><button class="btn btn-outline btn-sm" onclick="goPage('gelir-gider',document.querySelectorAll('.nav-btn')[1])">Tümü</button></div>`;
+  if(!last5.length) html += `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">Henüz işlem yok</div></div>`;
+  else html += last5.map(t=>`<div class="list-item"><div class="list-item-info"><div class="list-item-name">${t.desc||t.category}</div><div class="list-item-sub">${fmtDate(t.date)}</div></div><div class="list-item-right"><div class="list-item-amount ${t.type==='gelir'?'income':'expense'}">${t.type==='gelir'?'+':'-'}${fmt(t.amount)}</div></div></div>`).join('');
+  html += `</div>`;
+  document.getElementById('page-dashboard').innerHTML = html;
+}
+
+let ggTab = 'all';
+function renderGelirGider() {
+  const monthStr = today().slice(0,7);
+  const filtered = ggTab==='all' ? transactions : transactions.filter(t=>t.type===ggTab);
+  const sorted = [...filtered].sort((a,b)=>b.id-a.id);
+  const totalGelir = transactions.filter(t=>t.type==='gelir'&&t.date&&t.date.startsWith(monthStr)).reduce((s,t)=>s+t.amount,0);
+  const totalGider = transactions.filter(t=>t.type==='gider'&&t.date&&t.date.startsWith(monthStr)).reduce((s,t)=>s+t.amount,0);
+  let html = `<div class="stats-grid"><div class="stat-card"><div class="stat-label">Bu Ay Gelir</div><div class="stat-value green">${fmt(totalGelir)}</div></div><div class="stat-card"><div class="stat-label">Bu Ay Gider</div><div class="stat-value red">${fmt(totalGider)}</div></div></div>
+  <div class="tab-bar"><button class="tab-btn ${ggTab==='all'?'active':''}" onclick="ggTab='all';renderGelirGider()">Tümü</button><button class="tab-btn ${ggTab==='gelir'?'active':''}" onclick="ggTab='gelir';renderGelirGider()">Gelir</button><button class="tab-btn ${ggTab==='gider'?'active':''}" onclick="ggTab='gider';renderGelirGider()">Gider</button></div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;"><button class="btn btn-success btn-sm" onclick="modalGelir()">+ Gelir</button><button class="btn btn-primary btn-sm" onclick="modalGider()">+ Gider</button></div>
+  <div class="card">`;
+  if(!sorted.length) html += `<div class="empty-state"><div class="empty-state-icon">💰</div><div class="empty-state-text">İşlem bulunamadı</div></div>`;
+  else html += sorted.map(t=>`<div class="list-item"><div class="list-item-info"><div class="list-item-name">${t.desc||t.category}</div><div class="list-item-sub">${fmtDate(t.date)} • <span class="badge ${t.type==='gelir'?'badge-green':'badge-red'}">${t.category}</span></div></div><div class="list-item-right"><div class="list-item-amount ${t.type==='gelir'?'income':'expense'}">${t.type==='gelir'?'+':'-'}${fmt(t.amount)}</div><button class="btn btn-danger btn-sm" style="margin-top:4px" onclick="deleteTx(${t.id})">Sil</button></div></div>`).join('');
+  html += `</div>`;
+  document.getElementById('page-gelir-gider').innerHTML = html;
+}
+function modalGelir() { openModal(`<div class="modal-title">💚 Gelir Ekle</div><div class="form-group"><label class="form-label">Açıklama</label><input id="m-desc" class="form-input" placeholder="Örn: Sabah kasa"></div><div class="form-group"><label class="form-label">Kategori</label><select id="m-cat" class="form-select"><option>Kasa Satış</option><option>Paket Servis</option><option>Catering</option><option>Diğer</option></select></div><div class="form-row"><div class="form-group"><label class="form-label">Tutar (₺)</label><input id="m-amt" class="form-input" type="number" placeholder="0.00"></div><div class="form-group"><label class="form-label">Tarih</label><input id="m-date" class="form-input" type="date" value="${today()}"></div></div><button class="btn btn-success btn-full" onclick="saveTx('gelir')">Kaydet</button>`); }
+function modalGider() { openModal(`<div class="modal-title">❤️ Gider Ekle</div><div class="form-group"><label class="form-label">Açıklama</label><input id="m-desc" class="form-input" placeholder="Örn: Kahve alımı"></div><div class="form-group"><label class="form-label">Kategori</label><select id="m-cat" class="form-select"><option>Ham Madde</option><option>Personel</option><option>Kira</option><option>Fatura</option><option>Ambalaj</option><option>Diğer</option></select></div><div class="form-row"><div class="form-group"><label class="form-label">Tutar (₺)</label><input id="m-amt" class="form-input" type="number" placeholder="0.00"></div><div class="form-group"><label class="form-label">Tarih</label><input id="m-date" class="form-input" type="date" value="${today()}"></div></div><button class="btn btn-primary btn-full" onclick="saveTx('gider')">Kaydet</button>`); }
+function saveTx(type) { const desc=document.getElementById('m-desc').value; const cat=document.getElementById('m-cat').value; const amt=parseFloat(document.getElementById('m-amt').value); const date=document.getElementById('m-date').value; if(!amt||amt<=0){toast('Geçerli tutar girin');return;} transactions.push({id:newId(),type,desc,category:cat,amount:amt,date}); save();closeModal();renderGelirGider();renderDashboard();toast(type==='gelir'?'✅ Gelir eklendi':'✅ Gider eklendi'); }
+function deleteTx(id) { transactions=transactions.filter(t=>t.id!==id); save();renderGelirGider();renderDashboard();toast('Silindi'); }
+
+let stokTab = 'all';
+function renderStok() {
+  const cats = ['all', ...new Set(stocks.map(s=>s.category))];
+  const filtered = stokTab==='all' ? stocks : stocks.filter(s=>s.category===stokTab);
+  const totalVal = stocks.reduce((s,st)=>s+st.qty*st.cost,0);
+  const lowCount = stocks.filter(s=>s.qty<=s.minQty).length;
+  let html = `<div class="stats-grid"><div class="stat-card"><div class="stat-label">Stok Değeri</div><div class="stat-value blue">${fmt(totalVal)}</div></div><div class="stat-card"><div class="stat-label">Kritik Ürün</div><div class="stat-value ${lowCount?'red':'green'}">${lowCount} ürün</div></div></div>
+  <div class="tab-bar">${cats.map(c=>`<button class="tab-btn ${stokTab===c?'active':''}" onclick="stokTab='${c}';renderStok()">${c==='all'?'Tümü':c}</button>`).join('')}</div>
+  <div style="margin-bottom:12px;"><button class="btn btn-primary btn-sm" onclick="modalStokEkle()">+ Yeni Ürün</button></div>
+  <div class="card">`;
+  if(!filtered.length) html += `<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-text">Ürün bulunamadı</div></div>`;
+  else html += filtered.map(s=>{
+    const pct = Math.min(100, Math.round((s.qty/Math.max(s.minQty*3,1))*100));
+    const low = s.qty <= s.minQty;
+    return `<div class="list-item" style="flex-direction:column;align-items:stretch;gap:6px;padding:10px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="list-item-name">${s.name}</div><div class="list-item-sub">${s.category}</div></div><div style="display:flex;gap:6px;align-items:center;"><span class="badge ${low?'badge-red':'badge-green'}">${s.qty} ${s.unit}</span><button class="btn btn-outline btn-sm" onclick="modalStokGuncelle(${s.id})">Güncelle</button></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);"><span>Min: ${s.minQty} ${s.unit}</span><span>Maliyet: ${fmt(s.cost)}</span><span>Değer: ${fmt(s.qty*s.cost)}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${low?'#dc2626':'#15803d'}"></div></div>
+    </div>`;
+  }).join('');
+  html += `</div>`;
+  document.getElementById('page-stok').innerHTML = html;
+}
+function modalStokEkle() { openModal(`<div class="modal-title">📦 Yeni Stok Ürünü</div><div class="form-group"><label class="form-label">Ürün Adı</label><input id="s-name" class="form-input" placeholder="Örn: Filtre Kahve"></div><div class="form-row"><div class="form-group"><label class="form-label">Kategori</label><select id="s-cat" class="form-select"><option>İçecek</option><option>Yiyecek</option><option>Malzeme</option><option>Ambalaj</option><option>Diğer</option></select></div><div class="form-group"><label class="form-label">Birim</label><select id="s-unit" class="form-select"><option>kg</option><option>gr</option><option>lt</option><option>ml</option><option>adet</option><option>kutu</option><option>paket</option></select></div></div><div class="form-row"><div class="form-group"><label class="form-label">Miktar</label><input id="s-qty" class="form-input" type="number" placeholder="0"></div><div class="form-group"><label class="form-label">Min. Miktar</label><input id="s-min" class="form-input" type="number" placeholder="0"></div></div><div class="form-group"><label class="form-label">Birim Maliyet (₺)</label><input id="s-cost" class="form-input" type="number" placeholder="0.00"></div><button class="btn btn-primary btn-full" onclick="saveStok()">Kaydet</button>`); }
+function saveStok() { const name=document.getElementById('s-name').value; if(!name){toast('Ürün adı girin');return;} stocks.push({id:newId(),name,category:document.getElementById('s-cat').value,unit:document.getElementById('s-unit').value,qty:parseFloat(document.getElementById('s-qty').value)||0,minQty:parseFloat(document.getElementById('s-min').value)||0,cost:parseFloat(document.getElementById('s-cost').value)||0}); save();closeModal();renderStok();toast('✅ Ürün eklendi'); }
+function modalStokGuncelle(id) { const s=stocks.find(x=>x.id===id); openModal(`<div class="modal-title">🔄 ${s.name}</div><div class="form-group"><label class="form-label">Mevcut: ${s.qty} ${s.unit}</label><select id="sg-op" class="form-select"><option value="add">Giriş (Ekle)</option><option value="sub">Çıkış (Çıkar)</option><option value="set">Kesin Değer</option></select></div><div class="form-group"><label class="form-label">Miktar</label><input id="sg-qty" class="form-input" type="number" placeholder="0"></div><div class="form-group"><label class="form-label">Yeni Maliyet (₺) - opsiyonel</label><input id="sg-cost" class="form-input" type="number" placeholder="${s.cost}"></div><div style="display:flex;gap:8px;"><button class="btn btn-primary btn-full" onclick="updateStok(${id})">Güncelle</button><button class="btn btn-danger btn-sm" onclick="deleteStok(${id})">Sil</button></div>`); }
+function updateStok(id) { const s=stocks.find(x=>x.id===id); const op=document.getElementById('sg-op').value; const qty=parseFloat(document.getElementById('sg-qty').value)||0; const cost=parseFloat(document.getElementById('sg-cost').value); if(op==='add')s.qty+=qty; else if(op==='sub')s.qty=Math.max(0,s.qty-qty); else s.qty=qty; if(cost)s.cost=cost; save();closeModal();renderStok();renderDashboard();toast('✅ Güncellendi'); }
+function deleteStok(id) { stocks=stocks.filter(s=>s.id!==id); save();closeModal();renderStok();toast('Silindi'); }
+
+let kisiTab = 'all';
+function renderKisiler() {
+  const filtered = kisiTab==='all' ? contacts : contacts.filter(c=>c.type===kisiTab);
+  let html = `<div class="tab-bar"><button class="tab-btn ${kisiTab==='all'?'active':''}" onclick="kisiTab='all';renderKisiler()">Tümü</button><button class="tab-btn ${kisiTab==='müşteri'?'active':''}" onclick="kisiTab='müşteri';renderKisiler()">Müşteri</button><button class="tab-btn ${kisiTab==='tedarikçi'?'active':''}" onclick="kisiTab='tedarikçi';renderKisiler()">Tedarikçi</button></div>
+  <div style="margin-bottom:12px;"><button class="btn btn-primary btn-sm" onclick="modalKisiEkle()">+ Kişi Ekle</button></div>
+  <div class="card">`;
+  if(!filtered.length) html += `<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Kayıt bulunamadı</div></div>`;
+  else html += filtered.map(c=>`<div class="list-item"><div class="list-item-info"><div class="list-item-name">${c.name}</div><div class="list-item-sub">${c.phone||''} • <span class="badge ${c.type==='müşteri'?'badge-blue':'badge-amber'}">${c.type}</span></div></div><div class="list-item-right"><div class="list-item-amount ${c.balance>=0?'income':'expense'}">${fmt(c.balance)}</div><button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="modalKisiDetay(${c.id})">Detay</button></div></div>`).join('');
+  html += `</div>`;
+  document.getElementById('page-kisiler').innerHTML = html;
+}
+function modalKisiEkle() { openModal(`<div class="modal-title">👤 Yeni Kişi / Firma</div><div class="form-group"><label class="form-label">Ad / Firma</label><input id="k-name" class="form-input" placeholder="Ad veya firma adı"></div><div class="form-row"><div class="form-group"><label class="form-label">Tür</label><select id="k-type" class="form-select"><option value="müşteri">Müşteri</option><option value="tedarikçi">Tedarikçi</option></select></div><div class="form-group"><label class="form-label">Telefon</label><input id="k-phone" class="form-input" placeholder="05xx..."></div></div><div class="form-group"><label class="form-label">Başlangıç Bakiyesi (₺)</label><input id="k-bal" class="form-input" type="number" value="0"></div><button class="btn btn-primary btn-full" onclick="saveKisi()">Kaydet</button>`); }
+function saveKisi() { const name=document.getElementById('k-name').value; if(!name){toast('Ad girin');return;} contacts.push({id:newId(),name,type:document.getElementById('k-type').value,phone:document.getElementById('k-phone').value,balance:parseFloat(document.getElementById('k-bal').value)||0}); save();closeModal();renderKisiler();toast('✅ Kişi eklendi'); }
+function modalKisiDetay(id) { const c=contacts.find(x=>x.id===id); openModal(`<div class="modal-title">${c.name}</div><div style="display:flex;gap:8px;margin-bottom:14px;"><span class="badge ${c.type==='müşteri'?'badge-blue':'badge-amber'}">${c.type}</span>${c.phone?`<span style="font-size:13px;color:var(--text2)">${c.phone}</span>`:''}</div><div class="stat-card" style="margin-bottom:14px;"><div class="stat-label">Bakiye</div><div class="stat-value ${c.balance>=0?'green':'red'}">${fmt(c.balance)}</div></div><div class="form-group"><label class="form-label">Bakiye Hareketi</label><div style="display:flex;gap:8px;"><input id="k-mov" class="form-input" type="number" placeholder="Tutar" style="flex:1"><select id="k-movop" class="form-select" style="width:120px"><option value="add">Tahsilat</option><option value="sub">Ödeme</option></select></div></div><div style="display:flex;gap:8px;"><button class="btn btn-success" style="flex:1" onclick="updateKisiBakiye(${id})">Uygula</button><button class="btn btn-danger btn-sm" onclick="deleteKisi(${id})">Sil</button></div>`); }
+function updateKisiBakiye(id) { const c=contacts.find(x=>x.id===id); const amt=parseFloat(document.getElementById('k-mov').value)||0; const op=document.getElementById('k-movop').value; c.balance+=op==='add'?amt:-amt; save();closeModal();renderKisiler();toast('✅ Bakiye güncellendi'); }
+function deleteKisi(id) { contacts=contacts.filter(c=>c.id!==id); save();closeModal();renderKisiler();toast('Silindi'); }
+
+let fisItems = [];
+function renderFatura() {
+  const sorted = [...invoices].sort((a,b)=>b.id-a.id);
+  let html = `<div style="margin-bottom:12px;"><button class="btn btn-primary btn-sm" onclick="modalFisOlustur()">+ Yeni Fiş / Fatura</button></div><div class="card">`;
+  if(!sorted.length) html += `<div class="empty-state"><div class="empty-state-icon">🧾</div><div class="empty-state-text">Henüz fiş/fatura yok</div></div>`;
+  else html += sorted.map(inv=>`<div class="list-item"><div class="list-item-info"><div class="list-item-name">${inv.type==='fatura'?'Fatura':'Fiş'} #${inv.no}</div><div class="list-item-sub">${fmtDate(inv.date)} • ${inv.customer||'Genel'}</div></div><div class="list-item-right"><div class="list-item-amount income">${fmt(inv.total)}</div><button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="modalFisGoster(${inv.id})">Görüntüle</button></div></div>`).join('');
+  html += `</div>`;
+  document.getElementById('page-fatura').innerHTML = html;
+}
+function modalFisOlustur() { fisItems=[{name:'',qty:1,price:0}]; renderFisModal(); }
+function renderFisModal() {
+  const itemsHtml = fisItems.map((item,i)=>`<div style="display:grid;grid-template-columns:1fr 60px 80px 32px;gap:6px;margin-bottom:6px;align-items:center;"><input class="form-input" placeholder="Ürün/hizmet" value="${item.name}" oninput="fisItems[${i}].name=this.value" style="font-size:13px;padding:8px"><input class="form-input" type="number" value="${item.qty}" oninput="fisItems[${i}].qty=parseFloat(this.value)||1" style="font-size:13px;padding:8px;text-align:center"><input class="form-input" type="number" value="${item.price}" oninput="fisItems[${i}].price=parseFloat(this.value)||0" style="font-size:13px;padding:8px"><button class="btn btn-danger btn-sm" onclick="fisItems.splice(${i},1);renderFisModal()" style="padding:8px 6px">✕</button></div>`).join('');
+  const total = fisItems.reduce((s,it)=>s+it.qty*it.price,0);
+  openModal(`<div class="modal-title">🧾 Yeni Fiş / Fatura</div><div class="form-row"><div class="form-group"><label class="form-label">Tür</label><select id="f-type" class="form-select"><option value="fis">Fiş</option><option value="fatura">Fatura</option></select></div><div class="form-group"><label class="form-label">Tarih</label><input id="f-date" class="form-input" type="date" value="${today()}"></div></div><div class="form-group"><label class="form-label">Müşteri</label><select id="f-cust" class="form-select"><option value="">Genel Müşteri</option>${contacts.filter(c=>c.type==='müşteri').map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}</select></div><div class="divider"></div><div style="display:grid;grid-template-columns:1fr 60px 80px 32px;gap:6px;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:var(--text2)">ÜRÜN</span><span style="font-size:11px;font-weight:600;color:var(--text2);text-align:center">ADET</span><span style="font-size:11px;font-weight:600;color:var(--text2)">FİYAT</span><span></span></div>${itemsHtml}<button class="btn btn-outline btn-sm btn-full" onclick="fisItems.push({name:'',qty:1,price:0});renderFisModal()" style="margin-bottom:12px">+ Satır Ekle</button><div class="divider"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span style="font-weight:700">TOPLAM</span><span style="font-size:18px;font-weight:700;color:var(--accent)">${fmt(total)}</span></div><button class="btn btn-primary btn-full" onclick="saveFis()">Kaydet</button>`);
+}
+function saveFis() { const items=fisItems.filter(it=>it.name); if(!items.length){toast('Kalem girin');return;} const total=items.reduce((s,it)=>s+it.qty*it.price,0); const no='FIS-'+String(invoices.length+1).padStart(4,'0'); const inv={id:newId(),no,type:document.getElementById('f-type').value,date:document.getElementById('f-date').value,customer:document.getElementById('f-cust').value,items,total}; invoices.push(inv); transactions.push({id:newId(),type:'gelir',desc:`${inv.type==='fatura'?'Fatura':'Fiş'} ${no}`,category:'Kasa Satış',amount:total,date:inv.date}); save();closeModal();renderFatura();toast('✅ Fiş oluşturuldu'); }
+function modalFisGoster(id) { const inv=invoices.find(x=>x.id===id); openModal(`<div class="receipt"><div class="receipt-header"><div class="receipt-title">🦩 Flamingo Park</div><div class="receipt-sub">${inv.type==='fatura'?'FATURA':'FİŞ'} No: ${inv.no}</div><div class="receipt-sub">${fmtDate(inv.date)}${inv.customer?' • '+inv.customer:''}</div></div><div class="divider"></div>${inv.items.map(it=>`<div class="receipt-row"><span>${it.name} x${it.qty}</span><span>${fmt(it.qty*it.price)}</span></div>`).join('')}<div class="receipt-total"><span>TOPLAM</span><span>${fmt(inv.total)}</span></div></div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-full" onclick="closeModal()">Kapat</button><button class="btn btn-danger btn-sm" onclick="deleteFis(${inv.id})">Sil</button></div>`); }
+function deleteFis(id) { invoices=invoices.filter(i=>i.id!==id); save();closeModal();renderFatura();toast('Silindi'); }
+
+const now = new Date();
+document.getElementById('topbar-date').innerHTML = now.toLocaleDateString('tr-TR',{weekday:'short',day:'numeric',month:'short'})+'<br>'+now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+renderDashboard();
+</script>
+</body>
+</html>
